@@ -12,7 +12,10 @@ export const CONTRACT_ADDRESSES = {
 }
 
 const client = createClient({
-  endpoint: process.env.NEXT_PUBLIC_GENLAYER_RPC || 'https://rpc-bradbury.genlayer.com'
+  endpoint: process.env.NEXT_PUBLIC_GENLAYER_RPC || 'https://rpc-bradbury.genlayer.com',
+  // ⚠️ provider: undefined prevents genlayer-js from routing through window.ethereum (MetaMask).
+  // MetaMask doesn't speak GenLayer's gen_call protocol and returns NOT_FOUND.
+  provider: undefined as any,
 })
 
 // ─── On-chain Reads ───────────────────────────────────────
