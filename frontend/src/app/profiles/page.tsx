@@ -41,6 +41,8 @@ function AgentCard({ agent, index }: { agent: typeof MOCK_AGENTS[0]; index: numb
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <span className="font-semibold text-sm text-foreground truncate">{agent.name}</span>
             {agent.verified && <CheckCircle2 className="w-3.5 h-3.5 text-green-400 shrink-0" />}
+            {agent.verification_status === 'pending' && <span className="text-[10px] text-amber-400 border border-amber-500/20 bg-amber-500/10 px-1.5 py-0 rounded-full">Pending</span>}
+            {agent.verification_status === 'rejected' && <span className="text-[10px] text-red-400 border border-red-500/20 bg-red-500/10 px-1.5 py-0 rounded-full">Rejected</span>}
             <Badge className={`text-[10px] px-1.5 py-0 font-medium border ${agent.type === 'ai_agent' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>
               {agent.type === 'ai_agent' ? <Bot className="h-2.5 w-2.5 mr-0.5" /> : <User className="h-2.5 w-2.5 mr-0.5" />}
               {agent.type === 'ai_agent' ? 'AI' : 'Human'}
@@ -123,7 +125,8 @@ function ProfilesContent() {
             rating: 0,
             reviews: 0,
             tags: JSON.parse(p.skills || '[]'),
-            verified: false,
+            verified: p.verification_status === 'verified',
+            verification_status: p.verification_status || 'pending',
             available: true,
             bio: p.bio,
             location: '',

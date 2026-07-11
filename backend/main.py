@@ -10,8 +10,13 @@ from pydantic import BaseModel
 from typing import Optional
 import sqlite3
 import json
+import httpx
 
-app = FastAPI(title="AgentDirectory API", version="1.0.0")
+GENLAYER_RPC = os.environ.get("GENLAYER_RPC", "https://rpc-bradbury.genlayer.com")
+PROFILE_REGISTRY_ADDRESS = os.environ.get("PROFILE_REGISTRY_ADDRESS", "0x2780E250b0170bc2d553E1b5C721B415040abCff")
+OWNER_PRIVATE_KEY = os.environ.get("OWNER_PRIVATE_KEY", "")
+
+app = FastAPI(title="AgentDirectory API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,6 +51,7 @@ def init_db():
             social_links TEXT DEFAULT '{}',
             agent_endpoint TEXT DEFAULT '',
             is_active INTEGER DEFAULT 1,
+            verification_status TEXT DEFAULT 'pending' CHECK(verification_status IN ('pending','verified','rejected')),
             created_at TEXT DEFAULT (datetime('now')),
             updated_at TEXT DEFAULT (datetime('now'))
         );
@@ -196,12 +202,50 @@ def register_profile(profile: ProfileCreate):
     conn = get_db()
     try:
         conn.execute(
-            """INSERT INTO profiles (address, profile_type, username, bio, skills, rates, social_links, agent_endpoint)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO profiles (address, profile_type, username, bio, skills, rates, social_links, agent_endpoint, verification_status)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')""",
             (profile.address, profile.profile_type, profile.username, profile.bio,
              profile.skills, profile.rates, profile.social_links, profile.agent_endpoint),
         )
         conn.commit()
+
+        # Submit to GenLayer for AI verification
+        profile_data = json.dumps({
+            "username": profile.username,
+            "bio": profile.bio,
+            "skills": profile.skills,
+            "profile_type": profile.profile_type,
+            "social_links": profile.social_links,
+        })
+        verification_status = "pending"
+        try:
+            payload = {
+                "jsonrpc": "2.0",
+                "method": "genlayer_simulate",
+                "params": [{
+                    "contractAddress": PROFILE_REGISTRY_ADDRESS,
+                    "functionName": "submit_for_verification",
+                    "args": [profile.address, profile_data],
+                }],
+                "id": 1,
+            }
+            resp = httpx.post(GENLAYER_RPC, json=payload, timeout=30)
+            result = resp.json()
+            if result.get("result"):
+                onchain = result["result"]
+                if isinstance(onchain, dict):
+                    verification_status = onchain.get("status", "pending")
+        except Exception as e:
+            print(f"GenLayer verification failed: {e}")
+            # Still accept the profile, mark as unverified
+
+        # Update verification status from on-chain result
+        conn.execute(
+            "UPDATE profiles SET verification_status = ?, updated_at = datetime('now') WHERE address = ?",
+            (verification_status, profile.address),
+        )
+        conn.commit()
+
         row = conn.execute("SELECT * FROM profiles WHERE address = ?", (profile.address,)).fetchone()
         conn.close()
         return dict(row)
