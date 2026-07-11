@@ -9,6 +9,8 @@ import { useWallet } from '@/components/WalletProvider'
 import { getStats } from '@/lib/genlayer'
 import { motion } from 'framer-motion'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
 function AnimatedNumber({ value, suffix = '' }: { value: string; suffix?: string }) {
   const [display, setDisplay] = useState('0')
   const num = parseInt(value) || 0
@@ -119,15 +121,27 @@ export default function HomePage() {
   useEffect(() => {
     async function loadStats() {
       setLoading(true)
-      const data = await getStats()
-      if (data) {
-        setStats([
-          { label: 'Total Profiles', value: data.total_profiles?.toString() || '0' },
-          { label: 'AI Agents', value: data.agent_profiles?.toString() || '0' },
-          { label: 'Avg Reputation', value: '—' },
-          { label: 'Disputes Resolved', value: data.disputes_resolved?.toString() || '—' },
-        ])
-      } else {
+      try {
+        const data = await getStats()
+        if (data) {
+          setStats([
+            { label: 'Total Profiles', value: data.total?.toString() || data.total_profiles?.toString() || '0' },
+            { label: 'AI Agents', value: data.ai_agents?.toString() || '0' },
+            { label: 'Avg Reputation', value: '—' },
+            { label: 'Disputes Resolved', value: data.disputes_resolved?.toString() || '—' },
+          ])
+        } else {
+          // Fallback: try the backend API
+          const res = await fetch(`${API_URL}/api/profiles?limit=0`)
+          const json = await res.json()
+          setStats([
+            { label: 'Total Profiles', value: json.total?.toString() || '0' },
+            { label: 'AI Agents', value: '0' },
+            { label: 'Avg Reputation', value: '—' },
+            { label: 'Disputes Resolved', value: '—' },
+          ])
+        }
+      } catch {
         setStats([
           { label: 'Total Profiles', value: '0' }, { label: 'AI Agents', value: '0' },
           { label: 'Avg Reputation', value: '—' }, { label: 'Disputes Resolved', value: '—' },

@@ -113,9 +113,23 @@ function ProfilesContent() {
       setLoading(true)
       try {
         const result = await listProfiles() as any
-        const profiles = result?.profiles || result?.data || (Array.isArray(result) ? result : [])
-        if (Array.isArray(profiles) && profiles.length > 0) {
-          setAgents(profiles.slice(0, 20))
+        const raw = result?.profiles || result?.data || (Array.isArray(result) ? result : [])
+        if (Array.isArray(raw) && raw.length > 0) {
+          const mapped = raw.map((p: any) => ({
+            id: p.address,
+            name: p.username,
+            role: p.bio?.slice(0, 60) || 'No bio',
+            type: p.profile_type || 'human',
+            rating: 0,
+            reviews: 0,
+            tags: JSON.parse(p.skills || '[]'),
+            verified: false,
+            available: true,
+            bio: p.bio,
+            location: '',
+            hourly: JSON.parse(p.rates || '{}')?.usd ? `$${JSON.parse(p.rates).usd}` : ''
+          }))
+          setAgents(mapped.slice(0, 20))
         } else {
           setAgents(MOCK_AGENTS)
         }
