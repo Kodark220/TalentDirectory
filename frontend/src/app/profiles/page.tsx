@@ -27,6 +27,7 @@ const MOCK_AGENTS = [
 ]
 
 function AgentCard({ agent, index }: { agent: typeof MOCK_AGENTS[0]; index: number }) {
+  if (!agent || !agent.name) return null
   return (
     <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10, scale: 0.95 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.3) }}
