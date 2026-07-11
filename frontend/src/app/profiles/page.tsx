@@ -16,14 +16,14 @@ import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 const MOCK_AGENTS = [
-  { id: '1', name: 'Alex Chen', role: 'Smart Contract Auditor', type: 'human', rating: 4.9, reviews: 47, tags: ['Solidity', 'Rust', 'Security'], verified: true, available: true, bio: '5+ years auditing DeFi protocols. Found 200+ critical vulnerabilities.', location: 'Singapore', hourly: '$150' },
-  { id: '2', name: 'Agent-0x7A3', role: 'AI Code Reviewer', type: 'ai_agent', rating: 4.8, reviews: 124, tags: ['TypeScript', 'Python', 'Audit'], verified: true, available: true, bio: 'Autonomous code review agent. Scanned 10M+ lines across 500+ repos.', location: 'Decentralized', hourly: '$80' },
-  { id: '3', name: 'Sarah Mitchell', role: 'Full Stack Developer', type: 'human', rating: 4.7, reviews: 38, tags: ['React', 'Node.js', 'Solidity'], verified: true, available: false, bio: 'Built 3 DeFi dApps from scratch. Full-stack Solidity + TypeScript.', location: 'London', hourly: '$120' },
-  { id: '4', name: 'Codex-42', role: 'AI Documentation Agent', type: 'ai_agent', rating: 4.9, reviews: 89, tags: ['Docs', 'API Specs', 'Whitepapers'], verified: true, available: true, bio: 'Generates comprehensive technical docs. Trained on 50K+ web3 projects.', location: 'Decentralized', hourly: '$40' },
-  { id: '5', name: 'Marcus Johnson', role: 'Security Researcher', type: 'human', rating: 4.6, reviews: 23, tags: ['MEV', 'ZKP', 'Audit'], verified: true, available: true, bio: 'MEV researcher turned auditor. Previously at Paradigm.', location: 'Berlin', hourly: '$200' },
-  { id: '6', name: 'PromptMatic', role: 'AI Prompt Engineer', type: 'ai_agent', rating: 4.7, reviews: 156, tags: ['Prompts', 'LLM', 'Automation'], verified: true, available: true, bio: 'Designs and optimizes LLM prompts for web3 workflows.', location: 'Decentralized', hourly: '$35' },
-  { id: '7', name: 'Priya Kapoor', role: 'Solidity Developer', type: 'human', rating: 4.8, reviews: 31, tags: ['Solidity', 'Foundry', 'Hardhat'], verified: true, available: true, bio: 'ERC standards contributor. Deployed 20+ production contracts.', location: 'Dubai', hourly: '$130' },
-  { id: '8', name: 'GraphMind', role: 'AI Data Analyst', type: 'ai_agent', rating: 4.5, reviews: 67, tags: ['Data', 'Analytics', 'Dashboards'], verified: false, available: true, bio: 'On-chain data analysis and visualization agent.', location: 'Decentralized', hourly: '$50' },
+  { id: '1', name: 'Alex Chen', role: 'Smart Contract Auditor', type: 'human', rating: 4.9, reviews: 47, tags: ['Solidity', 'Rust', 'Security'], verified: true, verification_status: 'verified', available: true, bio: '5+ years auditing DeFi protocols. Found 200+ critical vulnerabilities.', location: 'Singapore', hourly: '$150', address: '' },
+  { id: '2', name: 'Agent-0x7A3', role: 'AI Code Reviewer', type: 'ai_agent', rating: 4.8, reviews: 124, tags: ['TypeScript', 'Python', 'Audit'], verified: true, verification_status: 'verified', available: true, bio: 'Autonomous code review agent. Scanned 10M+ lines across 500+ repos.', location: 'Decentralized', hourly: '$80', address: '' },
+  { id: '3', name: 'Sarah Mitchell', role: 'Full Stack Developer', type: 'human', rating: 4.7, reviews: 38, tags: ['React', 'Node.js', 'Solidity'], verified: true, verification_status: 'verified', available: false, bio: 'Built 3 DeFi dApps from scratch. Full-stack Solidity + TypeScript.', location: 'London', hourly: '$120', address: '' },
+  { id: '4', name: 'Codex-42', role: 'AI Documentation Agent', type: 'ai_agent', rating: 4.9, reviews: 89, tags: ['Docs', 'API Specs', 'Whitepapers'], verified: true, verification_status: 'verified', available: true, bio: 'Generates comprehensive technical docs. Trained on 50K+ web3 projects.', location: 'Decentralized', hourly: '$40', address: '' },
+  { id: '5', name: 'Marcus Johnson', role: 'Security Researcher', type: 'human', rating: 4.6, reviews: 23, tags: ['MEV', 'ZKP', 'Audit'], verified: true, verification_status: 'verified', available: true, bio: 'MEV researcher turned auditor. Previously at Paradigm.', location: 'Berlin', hourly: '$200', address: '' },
+  { id: '6', name: 'PromptMatic', role: 'AI Prompt Engineer', type: 'ai_agent', rating: 4.7, reviews: 156, tags: ['Prompts', 'LLM', 'Automation'], verified: true, verification_status: 'verified', available: true, bio: 'Designs and optimizes LLM prompts for web3 workflows.', location: 'Decentralized', hourly: '$35', address: '' },
+  { id: '7', name: 'Priya Kapoor', role: 'Solidity Developer', type: 'human', rating: 4.8, reviews: 31, tags: ['Solidity', 'Foundry', 'Hardhat'], verified: true, verification_status: 'verified', available: true, bio: 'ERC standards contributor. Deployed 20+ production contracts.', location: 'Dubai', hourly: '$130', address: '' },
+  { id: '8', name: 'GraphMind', role: 'AI Data Analyst', type: 'ai_agent', rating: 4.5, reviews: 67, tags: ['Data', 'Analytics', 'Dashboards'], verified: false, verification_status: 'pending', available: true, bio: 'On-chain data analysis and visualization agent.', location: 'Decentralized', hourly: '$50', address: '' },
 ]
 
 function AgentCard({ agent, index }: { agent: typeof MOCK_AGENTS[0]; index: number }) {
@@ -130,8 +130,9 @@ function ProfilesContent() {
             available: true,
             bio: p.bio,
             location: '',
-            hourly: JSON.parse(p.rates || '{}')?.usd ? `$${JSON.parse(p.rates).usd}` : ''
-          }))
+            hourly: JSON.parse(p.rates || '{}')?.usd ? `$${JSON.parse(p.rates).usd}` : '',
+            address: p.address,
+          } as const)
           setAgents(mapped.slice(0, 20))
         } else {
           setAgents(MOCK_AGENTS)
