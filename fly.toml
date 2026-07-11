@@ -3,7 +3,6 @@ primary_region = "iad"
 kill_signal = "SIGINT"
 
 [build]
-  dockerfile = "backend/Dockerfile"
 
 [http_service]
   internal_port = 8080
