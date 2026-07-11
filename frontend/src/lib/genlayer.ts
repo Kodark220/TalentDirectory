@@ -3,7 +3,7 @@ import { createClient } from 'genlayer-js'
 import toast from 'react-hot-toast'
 
 export const CONTRACT_ADDRESSES = {
-  profileRegistry: '0x2780E250b0170bc2d553E1b5C721B415040abCff',
+  profileRegistry: '0x8954d3e2528D6FF18835a81BD7Cf092485eb3cF6',
   reputationUpdater: '0xf8C35248F6F3094655E0C97313a37E00B5FCCa0e',
   disputeArbitrator: '0x4b7401Fd9b73439b1b89F191567367df5479fBff',
 }

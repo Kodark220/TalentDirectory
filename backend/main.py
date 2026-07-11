@@ -13,7 +13,7 @@ import json
 import httpx
 
 GENLAYER_RPC = os.environ.get("GENLAYER_RPC", "https://rpc-bradbury.genlayer.com")
-PROFILE_REGISTRY_ADDRESS = os.environ.get("PROFILE_REGISTRY_ADDRESS", "0x2780E250b0170bc2d553E1b5C721B415040abCff")
+PROFILE_REGISTRY_ADDRESS = os.environ.get("PROFILE_REGISTRY_ADDRESS", "0x8954d3e2528D6FF18835a81BD7Cf092485eb3cF6")
 OWNER_PRIVATE_KEY = os.environ.get("OWNER_PRIVATE_KEY", "")
 
 app = FastAPI(title="AgentDirectory API", version="2.0.0")
