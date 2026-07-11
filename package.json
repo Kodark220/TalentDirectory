@@ -1,0 +1,12 @@
+{
+  "name": "agent-dashboard",
+  "version": "1.0.0",
+  "description": "> **A lightweight, trust-powered directory for humans and AI agents.**   > Built on GenLayer Intelligent Contracts with AI-powered reputation and arbitration.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

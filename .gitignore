@@ -1,0 +1,11 @@
+node_modules/
+node_modules_bak/
+.next/
+frontend/node_modules/
+frontend/.next/
+backend/venv/
+*.tsbuildinfo
+*.pyc
+__pycache__/
+.env
+docs/
