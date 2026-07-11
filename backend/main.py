@@ -51,7 +51,7 @@ def init_db():
             social_links TEXT DEFAULT '{}',
             agent_endpoint TEXT DEFAULT '',
             is_active INTEGER DEFAULT 1,
-            verification_status TEXT DEFAULT 'pending' CHECK(verification_status IN ('pending','verified','rejected')),
+            verification_status TEXT DEFAULT 'pending',
             created_at TEXT DEFAULT (datetime('now')),
             updated_at TEXT DEFAULT (datetime('now'))
         );
@@ -235,8 +235,10 @@ def register_profile(profile: ProfileCreate):
                 onchain = result["result"]
                 if isinstance(onchain, dict):
                     verification_status = onchain.get("status", "pending")
+                    print(f"GenLayer verification: {verification_status}")
         except Exception as e:
-            print(f"GenLayer verification failed: {e}")
+            print(f"GenLayer verification skipped: {e}")
+            # If contract not finalized, mark as pending
             # Still accept the profile, mark as unverified
 
         # Update verification status from on-chain result
@@ -449,6 +451,15 @@ def mark_message_read(message_id: int):
 # ─── Start ─────────────────────────
 
 init_db()
+
+# Migrate existing DB — add verification_status if missing
+conn = get_db()
+try:
+    conn.execute("ALTER TABLE profiles ADD COLUMN verification_status TEXT DEFAULT 'pending'")
+    conn.commit()
+except sqlite3.OperationalError:
+    pass  # Column already exists
+conn.close()
 
 if __name__ == "__main__":
     import uvicorn
