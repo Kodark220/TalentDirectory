@@ -155,7 +155,11 @@ class MessageCreate(BaseModel):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    # Check DB schema has verification_status
+    conn = get_db()
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(profiles)").fetchall()]
+    conn.close()
+    return {"status": "ok", "schema_version": "2.0", "columns": cols}
 
 
 # ─── Profiles ───────────────────────
